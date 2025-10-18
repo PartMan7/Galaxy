@@ -1,6 +1,6 @@
 .star {
 	@media (prefers-reduced-motion: no-preference) {
-		animation: star-pulse ease-in-out infinite;
+		animation: star-pulse ease-in-out infinite alternate;
 		animation-duration: var(--duration);
 		animation-delay: var(--delay);
 	}
@@ -20,13 +20,10 @@
 }
 
 @keyframes star-pulse {
-	0% {
+	from {
 		filter: brightness(1);
 	}
-	50% {
+	to {
 		filter: brightness(0.5);
-	}
-	100% {
-		filter: brightness(1);
 	}
 }

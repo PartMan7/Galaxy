@@ -31,8 +31,8 @@ function Star({
 				backgroundColor: color,
 				opacity: brightness,
 				// @ts-ignore -- CSS variables -- TODO add types for variables somewhere
-				'--duration': `${duration}ms`,
-				'--delay': `${animationOffset}ms`,
+				'--duration': `${duration / 2}ms`, // halved because the transition is on 'alternate'
+				'--delay': `-${animationOffset}ms`, // we need to do something about all stars starting 'bright'; maybe something to animate them in?
 			}}
 		/>
 	);
