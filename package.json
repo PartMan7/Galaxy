@@ -4,13 +4,15 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "BUN_JSC_useTemporal=1 bun --hot src/index.tsx",
-		"start": "BUN_JSC_useTemporal=1 NODE_ENV=production bun src/index.tsx",
-		"build": "BUN_JSC_useTemporal=1bun run build.ts"
+		"dev": "bun --hot src/index.tsx",
+		"start": "NODE_ENV=production bun src/index.tsx",
+		"build": "bun run build.ts"
 	},
 	"dependencies": {
+		"@apollo/client": "^4.0.7",
 		"@js-temporal/polyfill": "^0.5.1",
 		"bun-plugin-tailwind": "^0.0.15",
+		"graphql": "^16.11.0",
 		"react": "^19",
 		"react-dom": "^19",
 		"tailwindcss": "^4.1.11"

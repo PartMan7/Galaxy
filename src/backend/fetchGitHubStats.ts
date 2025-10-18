@@ -1,43 +1,104 @@
+import fs from 'node:fs';
+import { gql } from '@apollo/client';
 import { Temporal } from '@js-temporal/polyfill';
 
-interface CommitContribution {
-	repository: {
-		name: string;
-	};
-	contributions: {
-		totalCount: number;
-	};
-}
+import client from './gql';
 
-interface ContributionsCollection {
-	totalCommitContributions: number;
-	totalPullRequestContributions: number;
-	totalIssueContributions: number;
-	commitContributionsByRepository: CommitContribution[];
-}
-
-interface GitHubStatsResponse {
-	data: {
-		user: {
-			contributionsCollection: ContributionsCollection;
+type GitHubStatsResponse = {
+	user: {
+		contributionsCollection: {
+			totalCommitContributions: number;
+			totalPullRequestContributions: number;
+			totalIssueContributions: number;
+			commitContributionsByRepository: {
+				repository: {
+					name: string;
+					url: string;
+					defaultBranchRef: {
+						target: {
+							history: {
+								edges: {
+									node: {
+										oid: string;
+										messageHeadline: string;
+										committedDate: string;
+										author: {
+											name: string;
+											email: string;
+										};
+										additions: number;
+										deletions: number;
+									};
+								}[];
+							};
+						};
+					};
+				};
+			}[];
 		};
 	};
-	errors?: Array<{
-		message: string;
-		locations?: Array<{ line: number; column: number }>;
-		path?: string[];
-	}>;
-}
+};
 
-export interface GitHubStats {
+export type GitHubStats = {
 	totalCommits: number;
 	totalPullRequests: number;
 	totalIssues: number;
-	repositoryContributions: Array<{
+	repositoryContributions: {
 		repositoryName: string;
 		commitCount: number;
-	}>;
-}
+	}[];
+};
+
+const USER_ID_QUERY = gql`
+	query GetUserId {
+		user(login: "PartMan7") {
+			id
+		}
+	}
+`;
+
+const CONTRIBUTIONS_QUERY = gql`
+	query Contributions($from: DateTime!, $to: DateTime!, $since: GitTimestamp!, $until: GitTimestamp!, $authorId: ID!) {
+		user(login: "PartMan7") {
+			contributionsCollection(from: $from, to: $to) {
+				totalCommitContributions
+				totalPullRequestContributions
+				totalIssueContributions
+				commitContributionsByRepository(maxRepositories: 100) {
+					repository {
+						name
+						url
+						defaultBranchRef {
+							target {
+								... on Commit {
+									history(first: 100, since: $since, until: $until, author: { id: $authorId }) {
+										edges {
+											node {
+												oid
+												messageHeadline
+												committedDate
+												author {
+													name
+													email
+												}
+												additions
+												deletions
+											}
+										}
+										pageInfo {
+											hasNextPage
+											endCursor
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+`;
 
 export async function fetchGitHubStats(
 	until: Temporal.Instant = Temporal.Now.instant(),
@@ -46,62 +107,33 @@ export async function fetchGitHubStats(
 	const from = until.subtract(duration).toString();
 	const to = until.toString();
 
-	const query = `
-    query($username: String!, $from: DateTime!, $to: DateTime!) {
-      user(login: $username) {
-        contributionsCollection(from: $from, to: $to) {
-          totalCommitContributions
-          totalPullRequestContributions
-          totalIssueContributions
-          commitContributionsByRepository(maxRepositories: 100) {
-            repository {
-              name
-            }
-            contributions {
-              totalCount
-            }
-          }
-        }
-      }
-    }
-  `;
-
-	const variables = {
-		username: process.env.GITHUB_USERNAME,
-		from,
-		to,
-	};
-
 	try {
-		const response = await fetch('https://api.github.com/graphql', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-				'User-Agent': 'Galaxy-Stats-App',
-			},
-			body: JSON.stringify({
-				query,
-				variables,
-			}),
+		// First, get the user ID
+		const userIdResponse = await client.query<{ user: { id: string } }>({
+			query: USER_ID_QUERY,
 		});
 
-		if (!response.ok) {
-			throw new Error(`GitHub API request failed: ${response.status} ${response.statusText}`);
+		if (!userIdResponse.data?.user?.id) {
+			throw new Error('Could not fetch user ID');
 		}
 
-		const result: GitHubStatsResponse = await response.json();
+		const authorId = userIdResponse.data.user.id;
 
-		if (result.errors) {
-			const errorMessages = result.errors.map(e => e.message).join(', ');
-			throw new Error(`GitHub GraphQL API errors: ${errorMessages}`);
+		// Now fetch contributions with the author filter
+		const response = await client.query<GitHubStatsResponse>({
+			query: CONTRIBUTIONS_QUERY,
+			variables: { username: process.env.GITHUB_USERNAME, from, to, since: from, until: to, authorId },
+		});
+
+		if (response.error) {
+			throw new Error(`GitHub GraphQL API errors: ${response.error.message}`);
 		}
 
-		if (!result.data?.user?.contributionsCollection) {
+		if (!response.data?.user?.contributionsCollection) {
 			throw new Error('Invalid response from GitHub API');
 		}
 
-		const collection = result.data.user.contributionsCollection;
+		const collection = response.data.user.contributionsCollection;
 
 		return {
 			totalCommits: collection.totalCommitContributions,
@@ -109,7 +141,7 @@ export async function fetchGitHubStats(
 			totalIssues: collection.totalIssueContributions,
 			repositoryContributions: collection.commitContributionsByRepository.map(item => ({
 				repositoryName: item.repository.name,
-				commitCount: item.contributions.totalCount,
+				commitCount: item.repository.defaultBranchRef.target.history.edges.length,
 			})),
 		};
 	} catch (error) {
@@ -119,3 +151,5 @@ export async function fetchGitHubStats(
 		throw error;
 	}
 }
+
+console.log(await fetchGitHubStats());
