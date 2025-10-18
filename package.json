@@ -4,11 +4,12 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "bun --hot src/index.tsx",
-		"start": "NODE_ENV=production bun src/index.tsx",
-		"build": "bun run build.ts"
+		"dev": "BUN_JSC_useTemporal=1 bun --hot src/index.tsx",
+		"start": "BUN_JSC_useTemporal=1 NODE_ENV=production bun src/index.tsx",
+		"build": "BUN_JSC_useTemporal=1bun run build.ts"
 	},
 	"dependencies": {
+		"@js-temporal/polyfill": "^0.5.1",
 		"bun-plugin-tailwind": "^0.0.15",
 		"react": "^19",
 		"react-dom": "^19",
