@@ -4,11 +4,9 @@ import backend from './backend';
 
 const server = serve({
 	routes: {
-		// Serve index.html for all unmatched routes.
 		'/*': index,
-
 		'/api/github': {
-			async GET(req) {
+			async GET() {
 				return Response.json(await backend.github());
 			},
 		},

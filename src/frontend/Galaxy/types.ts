@@ -1,16 +1,14 @@
-/**
- * At the moment I'm just
- */
-export type Commit = {
-	revision: string;
-};
+export type { GitHubCommit as Commit } from '@/backend/fetchGitHubStats';
 
 export type StarProps = {
-	x: number;
-	y: number;
+	coords: { x: number; y: number };
 	size: number;
 	points: 4 | 6;
+	desc: string;
 	color: string;
 	rotation: number;
 	brightness: number;
+	url: string;
+	duration: number;
+	animationOffset: number;
 };

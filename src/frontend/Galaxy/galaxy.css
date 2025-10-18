@@ -1,0 +1,32 @@
+.star {
+	@media (prefers-reduced-motion: no-preference) {
+		animation: star-pulse ease-in-out infinite;
+		animation-duration: var(--duration);
+		animation-delay: var(--delay);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--color-amber-50);
+		outline-offset: 2px;
+		box-shadow: 0 0 20px var(--color-amber-50);
+	}
+
+	&:hover,
+	&:focus {
+		transform: scale(1.5);
+		transition: transform 200ms ease-in-out;
+	}
+	transition: transform 500ms ease-in-out;
+}
+
+@keyframes star-pulse {
+	0% {
+		filter: brightness(1);
+	}
+	50% {
+		filter: brightness(0.5);
+	}
+	100% {
+		filter: brightness(1);
+	}
+}
