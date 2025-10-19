@@ -25,13 +25,8 @@ function getCommitBrightness(commit: Commit): number {
 	return 1 - timeElapsed.total({ unit: 'days' }) / ROUGH_DAYS_IN_YEAR;
 }
 
-function getCommitDuration(RNG: () => number): number {
-	return sample([2000, 10000], RNG);
-}
-
-function getCommitAnimationOffset(RNG: () => number): number {
-	return sample([0, 1000], RNG);
-}
+const ANIMATION_DURATION_RANGE = [2000, 10000] as [number, number];
+const ANIMATION_OFFSET_RANGE = [0, 1000] as [number, number];
 
 export function commitToStar(commit: Commit): StarProps {
 	const prngSource = useRNG(cyrb128(commit.revision + 'commit')[0]);
@@ -39,12 +34,12 @@ export function commitToStar(commit: Commit): StarProps {
 	return {
 		desc: commit.message,
 		coords: plotGalaxy(prngSource),
-		duration: getCommitDuration(prngSource),
-		animationOffset: getCommitAnimationOffset(prngSource),
+		duration: sample(ANIMATION_DURATION_RANGE, prngSource),
+		animationOffset: sample(ANIMATION_OFFSET_RANGE, prngSource),
 		size: getCommitSize(commit),
 		points: 4,
 		color: 'var(--color-amber-50)',
-		rotation: 0,
+		rotation: sample(360, prngSource),
 		brightness: getCommitBrightness(commit),
 		url: commit.url,
 	};

@@ -13,11 +13,12 @@
 
 	&:hover,
 	&:focus {
-		transform: scale(1.5);
+		transform: scale(1.5) rotate(calc(360deg / var(--points) + var(--rotation)));
 		transition: transform 200ms ease-in-out;
 	}
 
 	will-change: transform;
+	transform: rotate(var(--rotation));
 	transition: transform 500ms ease-in-out;
 }
 

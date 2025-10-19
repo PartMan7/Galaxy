@@ -7,21 +7,10 @@ const ICONS: Record<number, React.ComponentType<React.SVGProps<SVGSVGElement>>> 
 	5: FivePoints,
 };
 
-function Star({
-	coords,
-	size,
-	points,
-	color,
-	brightness,
-	duration,
-	animationOffset,
-	desc,
-	url,
-	onHover,
-}: StarProps & {
-	onHover: (star: { url: string; desc: string } | null) => void;
-}) {
-	const Icon = ICONS[points] ?? FourPoints;
+type OnHover = (star: { url: string; desc: string } | null) => void;
+
+function Star({ desc, url, onHover, ...props }: StarProps & { onHover: OnHover }) {
+	const Icon = ICONS[props.points] ?? FourPoints;
 	return (
 		<Icon
 			tabIndex={0}
@@ -32,15 +21,17 @@ function Star({
 			onClick={() => window.open(url, '_blank')}
 			className="absolute cursor-pointer star"
 			style={{
-				left: coords.x,
-				top: coords.y,
-				width: size,
-				height: size,
-				color,
-				opacity: Math.round(brightness * 100),
+				left: props.coords.x,
+				top: props.coords.y,
+				width: props.size,
+				height: props.size,
+				color: props.color,
+				opacity: Math.round(props.brightness * 100),
 				// @ts-ignore -- CSS variables -- TODO add types for variables somewhere
-				'--duration': `${duration / 2}ms`, // halved because the transition is on 'alternate'
-				'--delay': `-${animationOffset}ms`, // we need to do something about all stars starting 'bright'; maybe something to animate them in?
+				'--points': props.points,
+				'--rotation': `${props.rotation}deg`,
+				'--duration': `${props.duration / 2}ms`, // halved because the transition is on 'alternate'
+				'--delay': `-${props.animationOffset}ms`, // we need to do something about all stars starting 'bright'; maybe something to animate them in?
 			}}
 		/>
 	);
