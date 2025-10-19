@@ -1,27 +1,37 @@
-import { fetchGitHubStats, type GitHubStats } from '@/backend/fetchGitHubStats';
+import path from 'path';
 import { Temporal } from '@js-temporal/polyfill';
+import { fetchGitHubStats } from '@/backend/fetchGitHubStats';
+import type { GitHubStats } from '@/backend/types';
 
-let mockStats: GitHubStats | null = null;
+const CACHE_FILE = path.join(process.cwd(), 'src', 'backend', 'github-stats.json');
+
+let cached: GitHubStats | null = null;
 try {
-	mockStats = require('./github-stats.json');
+	cached = JSON.parse(await Bun.file(CACHE_FILE).text());
 } catch {}
 
 let lastUpdated: Temporal.Instant | null = null;
 const cacheDuration = Temporal.Duration.from({ hours: 1 });
-let cached: GitHubStats | null = null;
+
+async function updateCached(newCached: GitHubStats): Promise<GitHubStats> {
+	cached = newCached;
+	await Bun.write(CACHE_FILE, JSON.stringify(newCached, null, 2));
+
+	return newCached;
+}
 
 export default {
 	async github(): Promise<GitHubStats> {
-		if (process.env.DEBUG && mockStats) return mockStats;
 		if (cached && lastUpdated) {
 			const timeSinceLastUpdate = Temporal.Now.instant().since(lastUpdated);
 			if (Temporal.Duration.compare(timeSinceLastUpdate, cacheDuration) < 0) {
 				return cached;
 			}
 		}
+
 		lastUpdated = Temporal.Now.instant();
-		const newCached = await fetchGitHubStats();
-		cached = newCached;
-		return newCached;
+		const fetchPromise = fetchGitHubStats().then(updateCached);
+		if (cached) return cached;
+		return fetchPromise;
 	},
 };

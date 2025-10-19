@@ -3,86 +3,22 @@ import { Temporal } from '@js-temporal/polyfill';
 
 import client from './gql';
 
-type GitHubStatsResponse = {
-	user: {
-		contributionsCollection: {
-			totalCommitContributions: number;
-			totalPullRequestContributions: number;
-			totalIssueContributions: number;
-			commitContributionsByRepository: {
-				repository: {
-					name: string;
-					url: string;
-					defaultBranchRef: {
-						target: {
-							history: {
-								edges: CommitEdge[];
-								pageInfo: {
-									hasNextPage: boolean;
-									endCursor: string;
-								};
-							};
-						};
-					};
-				};
-			}[];
-		};
-	};
-};
-
-type CommitEdge = {
-	node: {
-		oid: string;
-		messageHeadline: string;
-		committedDate: string;
-		author: {
-			name: string;
-			email: string;
-		};
-		additions: number;
-		deletions: number;
-		url: string;
-	};
-};
-
-type RepositoryHistoryResponse = {
-	repository: {
-		defaultBranchRef: {
-			target: {
-				history: {
-					edges: CommitEdge[];
-					pageInfo: {
-						hasNextPage: boolean;
-						endCursor: string;
-					};
-				};
-			};
-		};
-	};
-};
-
-export type GitHubCommit = {
-	revision: string;
-	message: string;
-	additions: number;
-	deletions: number;
-	committedDate: string;
-	url: string;
-};
-
-export type GitHubStats = {
-	totalCommits: number;
-	totalPullRequests: number;
-	totalIssues: number;
-	repositoryContributions: {
-		repositoryName: string;
-		commits: GitHubCommit[];
-	}[];
-};
+import type {
+	CommitEdge,
+	GitHubIssue,
+	GitHubPullRequest,
+	GitHubStats,
+	GitHubStatsResponse,
+	IssueContributionsResponse,
+	IssueEdge,
+	PullRequestContributionsResponse,
+	PullRequestEdge,
+	RepositoryHistoryResponse,
+} from './types';
 
 const USER_ID_QUERY = gql`
-	query GetUserId {
-		user(login: "PartMan7") {
+	query GetUserId($username: String!) {
+		user(login: $username) {
 			id
 		}
 	}
@@ -121,6 +57,50 @@ const CONTRIBUTIONS_QUERY = gql`
 				totalCommitContributions
 				totalPullRequestContributions
 				totalIssueContributions
+
+				pullRequestContributions(first: 100) {
+					edges {
+						node {
+							pullRequest {
+								url
+								title
+								createdAt
+								merged
+								headRefName
+								commits {
+									totalCount
+								}
+								comments {
+									totalCount
+								}
+							}
+						}
+					}
+					pageInfo {
+						hasNextPage
+						endCursor
+					}
+				}
+
+				issueContributions(first: 100) {
+					edges {
+						node {
+							issue {
+								url
+								title
+								createdAt
+								comments {
+									totalCount
+								}
+							}
+						}
+					}
+					pageInfo {
+						hasNextPage
+						endCursor
+					}
+				}
+
 				commitContributionsByRepository(maxRepositories: 100) {
 					repository {
 						name
@@ -176,6 +156,65 @@ const REPOSITORY_HISTORY_QUERY = gql`
 	${EDGE_FRAGMENT}
 `;
 
+const PULL_REQUEST_CONTRIBUTIONS_QUERY = gql`
+	query PullRequestContributions($from: DateTime!, $to: DateTime!, $authorName: String!, $after: String!) {
+		user(login: $authorName) {
+			contributionsCollection(from: $from, to: $to) {
+				pullRequestContributions(first: 100, after: $after) {
+					edges {
+						node {
+							pullRequest {
+								url
+								title
+								createdAt
+								merged
+								headRefName
+								commits {
+									totalCount
+								}
+								comments {
+									totalCount
+								}
+							}
+						}
+					}
+					pageInfo {
+						hasNextPage
+						endCursor
+					}
+				}
+			}
+		}
+	}
+`;
+
+const ISSUE_CONTRIBUTIONS_QUERY = gql`
+	query IssueContributions($from: DateTime!, $to: DateTime!, $authorName: String!, $after: String!) {
+		user(login: $authorName) {
+			contributionsCollection(from: $from, to: $to) {
+				issueContributions(first: 100, after: $after) {
+					edges {
+						node {
+							issue {
+								url
+								title
+								createdAt
+								comments {
+									totalCount
+								}
+							}
+						}
+					}
+					pageInfo {
+						hasNextPage
+						endCursor
+					}
+				}
+			}
+		}
+	}
+`;
+
 async function fetchAllCommitsForRepository(
 	owner: string,
 	name: string,
@@ -208,6 +247,66 @@ async function fetchAllCommitsForRepository(
 	return allEdges;
 }
 
+async function fetchAllPullRequests(
+	authorName: string,
+	from: string,
+	to: string,
+	initialEdges: PullRequestEdge[],
+	initialPageInfo: { hasNextPage: boolean; endCursor: string }
+): Promise<(PullRequestEdge | null)[]> {
+	const allEdges: PullRequestEdge[] = [...initialEdges];
+	let hasNextPage = initialPageInfo.hasNextPage;
+	let endCursor = initialPageInfo.endCursor;
+
+	while (hasNextPage) {
+		const response = await client.query<PullRequestContributionsResponse>({
+			query: PULL_REQUEST_CONTRIBUTIONS_QUERY,
+			variables: { authorName, from, to, after: endCursor },
+		});
+
+		if (!response.data?.user?.contributionsCollection?.pullRequestContributions) {
+			break;
+		}
+
+		const prContributions = response.data.user.contributionsCollection.pullRequestContributions;
+		allEdges.push(...prContributions.edges);
+		hasNextPage = prContributions.pageInfo.hasNextPage;
+		endCursor = prContributions.pageInfo.endCursor;
+	}
+
+	return allEdges;
+}
+
+async function fetchAllIssues(
+	authorName: string,
+	from: string,
+	to: string,
+	initialEdges: IssueEdge[],
+	initialPageInfo: { hasNextPage: boolean; endCursor: string }
+): Promise<IssueEdge[]> {
+	const allEdges: IssueEdge[] = [...initialEdges];
+	let hasNextPage = initialPageInfo.hasNextPage;
+	let endCursor = initialPageInfo.endCursor;
+
+	while (hasNextPage) {
+		const response = await client.query<IssueContributionsResponse>({
+			query: ISSUE_CONTRIBUTIONS_QUERY,
+			variables: { authorName, from, to, after: endCursor },
+		});
+
+		if (!response.data?.user?.contributionsCollection?.issueContributions) {
+			break;
+		}
+
+		const issueContributions = response.data.user.contributionsCollection.issueContributions;
+		allEdges.push(...issueContributions.edges);
+		hasNextPage = issueContributions.pageInfo.hasNextPage;
+		endCursor = issueContributions.pageInfo.endCursor;
+	}
+
+	return allEdges;
+}
+
 export async function fetchGitHubStats(
 	until: Temporal.Instant = Temporal.Now.instant(),
 	duration: Temporal.Duration = Temporal.Duration.from({ hours: 365 * 24 })
@@ -219,6 +318,7 @@ export async function fetchGitHubStats(
 		// First, get the user ID
 		const userIdResponse = await client.query<{ user: { id: string } }>({
 			query: USER_ID_QUERY,
+			variables: { username: process.env.GITHUB_USERNAME },
 		});
 
 		if (!userIdResponse.data?.user?.id) {
@@ -289,11 +389,52 @@ export async function fetchGitHubStats(
 			})
 		);
 
+		// Paginate through all pull requests
+		const allPullRequestEdges = await fetchAllPullRequests(
+			process.env.GITHUB_USERNAME || '',
+			from,
+			to,
+			collection.pullRequestContributions.edges,
+			collection.pullRequestContributions.pageInfo
+		);
+
+		const pullRequests: GitHubPullRequest[] = allPullRequestEdges.map(edge =>
+			edge
+				? {
+						url: edge.node.pullRequest.url,
+						title: edge.node.pullRequest.title,
+						createdAt: edge.node.pullRequest.createdAt,
+						merged: edge.node.pullRequest.merged,
+						headRefName: edge.node.pullRequest.headRefName,
+						totalCommits: edge.node.pullRequest.commits.totalCount,
+						totalComments: edge.node.pullRequest.comments.totalCount,
+					}
+				: edge
+		);
+
+		// Paginate through all issues
+		const allIssueEdges = await fetchAllIssues(
+			process.env.GITHUB_USERNAME || '',
+			from,
+			to,
+			collection.issueContributions.edges,
+			collection.issueContributions.pageInfo
+		);
+
+		const issues: GitHubIssue[] = allIssueEdges.map(edge => ({
+			url: edge.node.issue.url,
+			title: edge.node.issue.title,
+			createdAt: edge.node.issue.createdAt,
+			totalComments: edge.node.issue.comments.totalCount,
+		}));
+
 		return {
 			totalCommits: collection.totalCommitContributions,
 			totalPullRequests: collection.totalPullRequestContributions,
 			totalIssues: collection.totalIssueContributions,
 			repositoryContributions,
+			pullRequests,
+			issues,
 		};
 	} catch (error) {
 		if (error instanceof Error) {

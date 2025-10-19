@@ -3,6 +3,11 @@
 		animation: star-pulse ease-in-out infinite alternate;
 		animation-duration: var(--duration);
 		animation-delay: var(--delay);
+		&.drift {
+			animation:
+				star-pulse ease-in-out var(--duration) infinite alternate,
+				star-drift ease-in-out var(--duration) infinite alternate;
+		}
 	}
 
 	&:focus-visible {
@@ -20,6 +25,15 @@
 	will-change: transform;
 	transform: rotate(var(--rotation));
 	transition: transform 500ms ease-in-out;
+}
+
+@keyframes star-drift {
+	from {
+		transform: translate(0, 0);
+	}
+	to {
+		transform: rotate(calc(360deg / var(--points) + var(--rotation))) translate(5px, 5px);
+	}
 }
 
 @keyframes star-pulse {

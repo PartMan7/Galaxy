@@ -1,4 +1,5 @@
 import { sample } from '@/utils/prng';
+import { Temporal } from '@js-temporal/polyfill';
 
 enum GalaxyPart {
 	Center = 'center',
@@ -21,7 +22,7 @@ export const GALAXY_SIZE = 2 * SCATTERED_DISTANCE;
  * @returns
  */
 export function plotGalaxy(RNG: () => number): { x: number; y: number } {
-	const part = sample({ [GalaxyPart.Center]: 2, [GalaxyPart.Arms]: 3, [GalaxyPart.Scattered]: 2 }, RNG) as GalaxyPart;
+	const part = sample({ [GalaxyPart.Center]: 3, [GalaxyPart.Arms]: 3, [GalaxyPart.Scattered]: 2 }, RNG) as GalaxyPart;
 	switch (part) {
 		case GalaxyPart.Center: {
 			const radius = CENTER_RADIUS * RNG();
@@ -48,4 +49,14 @@ export function plotGalaxy(RNG: () => number): { x: number; y: number } {
 			};
 		}
 	}
+}
+
+const ONE_WEEK = Temporal.Duration.from({ hours: 7 * 24 });
+const ROUGH_DAYS_IN_YEAR = 400; // increased so that even dim stars don't have 0 brightness
+
+export function getBrightness(createdAt: Temporal.Instant): number {
+	const Now = Temporal.Now.instant();
+	const timeElapsed = Now.since(Temporal.Instant.from(createdAt));
+	if (Temporal.Duration.compare(timeElapsed, ONE_WEEK) < 0) return 1.5;
+	return 1 - timeElapsed.total({ unit: 'days' }) / ROUGH_DAYS_IN_YEAR;
 }

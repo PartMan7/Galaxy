@@ -1,11 +1,13 @@
 import './galaxy.css';
 
 import { useState, useMemo, useEffect, useLayoutEffect } from 'react';
-import type { GitHubStats } from '@/backend/fetchGitHubStats';
+import type { GitHubStats } from '@/backend/types';
 
 import { commitToStar } from './generators/commitToStar';
 import { Star } from './Star';
 import { GALAXY_SIZE } from './plotter';
+import { pullRequestToStar } from './generators/pullRequestToStar';
+import { issueToStar } from './generators/issueToStar';
 
 const MARGIN = 50;
 
@@ -31,22 +33,36 @@ export function Galaxy() {
 	}, []);
 
 	const stars = useMemo(() => {
-		return (data?.repositoryContributions.flatMap(repo => repo.commits.map(commit => commitToStar(commit))) ?? []).map(props => ({
-			...props,
-			coords: {
-				x: (props.coords.x * (windowWidth - 2 * MARGIN)) / GALAXY_SIZE + windowWidth / 2,
-				y: (props.coords.y * (windowHeight - 2 * MARGIN)) / GALAXY_SIZE + windowHeight / 2,
-			},
-		}));
+		const normalize = (coords: { x: number; y: number }) => ({
+			x: (coords.x * (windowWidth - 2 * MARGIN)) / GALAXY_SIZE + windowWidth / 2,
+			y: (coords.y * (windowHeight - 2 * MARGIN)) / GALAXY_SIZE + windowHeight / 2,
+		});
+
+		const commitStars =
+			data?.repositoryContributions
+				.flatMap(repo => repo.commits.map(commitToStar))
+				.map(props => ({ ...props, coords: normalize(props.coords) })) ?? [];
+		const pullRequestStars =
+			data?.pullRequests.map(pullRequestToStar).map(props => ({ ...props, coords: normalize(props.coords) })) ?? [];
+		const issueStars = data?.issues.map(issueToStar).map(props => ({ ...props, coords: normalize(props.coords) })) ?? [];
+
+		return [...commitStars, ...pullRequestStars, ...issueStars];
 	}, [data, windowWidth, windowHeight]);
 
-	const [hoveredStar, setHoveredStar] = useState<{ url: string; desc: string } | null>(null);
+	const [hoveredStar, setHoveredStar] = useState<{ url: string | null; desc: string } | null>(null);
 
 	return (
 		<div id="galaxy" className="h-full w-full">
-			<div id="hovered-star" className="absolute top-0 left-0 bg-black/50 z-10">
-				{hoveredStar?.desc}
-			</div>
+			{hoveredStar ? (
+				<div
+					id="hovered-star"
+					className="absolute top-0 left-0 bg-zinc-800 max-w-sm z-10 p-4  border-r-4 border-b-4 border-double border-amber-50 pointer-events-none"
+				>
+					{hoveredStar?.desc}
+					<br />
+					{hoveredStar?.url ? 'Click to view on GitHub' : null}
+				</div>
+			) : null}
 			{stars.map(star => (
 				<Star key={star.url} {...star} onHover={setHoveredStar} />
 			))}

@@ -1,13 +1,13 @@
 import { memo } from 'react';
-import type { StarProps } from './types';
 import { FourPoints, FivePoints } from './icons';
+import type { StarProps } from './types';
 
 const ICONS: Record<number, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
 	4: FourPoints,
 	5: FivePoints,
 };
 
-type OnHover = (star: { url: string; desc: string } | null) => void;
+type OnHover = (star: { url: string | null; desc: string } | null) => void;
 
 function Star({ desc, url, onHover, ...props }: StarProps & { onHover: OnHover }) {
 	const Icon = ICONS[props.points] ?? FourPoints;
@@ -18,8 +18,8 @@ function Star({ desc, url, onHover, ...props }: StarProps & { onHover: OnHover }
 			onBlur={() => onHover?.(null)}
 			onMouseEnter={() => onHover?.({ url, desc })}
 			onMouseLeave={() => onHover?.(null)}
-			onClick={() => window.open(url, '_blank')}
-			className="absolute cursor-pointer star"
+			onClick={() => (url ? window.open(url, '_blank') : undefined)}
+			className={`absolute cursor-pointer star ${props.drift ? 'drift' : ''}`}
 			style={{
 				left: props.coords.x,
 				top: props.coords.y,
