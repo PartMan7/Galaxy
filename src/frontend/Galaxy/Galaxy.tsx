@@ -2,8 +2,10 @@ import './galaxy.css';
 
 import { useState, useMemo, useEffect, useLayoutEffect } from 'react';
 import type { GitHubStats } from '@/backend/fetchGitHubStats';
-import { commitToStar, GALAXY_SIZE } from './commitToStar';
+
+import { commitToStar } from './generators/commitToStar';
 import { Star } from './Star';
+import { GALAXY_SIZE } from './plotter';
 
 const MARGIN = 50;
 

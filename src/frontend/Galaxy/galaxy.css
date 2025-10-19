@@ -16,6 +16,8 @@
 		transform: scale(1.5);
 		transition: transform 200ms ease-in-out;
 	}
+
+	will-change: transform;
 	transition: transform 500ms ease-in-out;
 }
 
