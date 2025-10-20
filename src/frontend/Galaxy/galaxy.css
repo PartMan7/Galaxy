@@ -1,5 +1,4 @@
 .star {
-	--base-brightness: 0.5;
 	--fade-in-duration: 1000ms;
 
 	--animation-star-fade-in: star-fade-in ease-in var(--fade-in-duration) var(--delay) both;
@@ -36,10 +35,7 @@
 
 @keyframes star-fade-in {
 	from {
-		filter: brightness(0);
-	}
-	to {
-		filter: brightness(var(--base-brightness));
+		opacity: 0;
 	}
 }
 
@@ -54,9 +50,9 @@
 
 @keyframes star-pulse {
 	from {
-		filter: brightness(var(--base-brightness));
+		opacity: var(calc(0.2 * var(--opacity)));
 	}
 	to {
-		filter: brightness(1);
+		opacity: var(--opacity);
 	}
 }

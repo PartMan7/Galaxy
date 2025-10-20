@@ -10,11 +10,6 @@ const ICONS: Record<number, React.ComponentType<React.SVGProps<SVGSVGElement>>> 
 	5: FivePoints,
 };
 
-function distribution(RNG: () => number): number {
-	const x = RNG();
-	return Math.pow((x * (1 - x)) / 0.5 ** 2, 1);
-}
-
 type OnHover = (star: { url: string | null; desc: string } | null) => void;
 
 function Star({ desc, url, onHover, RNG, coords, size, color, brightness, points }: CommonStarProps & { onHover: OnHover }) {
@@ -53,8 +48,8 @@ function Star({ desc, url, onHover, RNG, coords, size, color, brightness, points
 				width: size,
 				height: size,
 				color: color,
-				opacity: Math.round(brightness * 100),
 				// @ts-ignore -- CSS variables -- TODO add types for variables somewhere
+				'--opacity': `${Math.round(brightness * 100)}%`,
 				'--points': points,
 				'--rotation': `${rotation}deg`,
 				'--duration': `${duration}ms`, // halved because the transition is on 'alternate'

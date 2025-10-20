@@ -56,7 +56,7 @@ export function Galaxy() {
 	return (
 		<>
 			<Header />
-			<div id="galaxy" className="left-0 top-0 h-full w-full isolate">
+			<div id="galaxy" className="left-0 top-0 isolate">
 				{hoveredStar ? (
 					<div
 						id="hovered-star"
