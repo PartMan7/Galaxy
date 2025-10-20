@@ -7,13 +7,13 @@ enum GalaxyPart {
 	Scattered = 'scattered',
 }
 
-const CENTER_RADIUS = 50;
+export const CENTER_RADIUS = 60;
 const ARM_INIT_THETA = Math.PI / 4;
 const ARM_TURNS = Math.PI * 2; // 1 full turn
-const ARM_RADIUS = 100;
-const ARM_BASE_THICKNESS = 40;
-const ARM_TIP_THICKNESS = 10;
-const SCATTERED_DISTANCE = 200;
+export const ARM_RADIUS = 150;
+const ARM_BASE_THICKNESS = 50;
+const ARM_TIP_THICKNESS = 5;
+const SCATTERED_DISTANCE = 250;
 export const GALAXY_SIZE = 2 * SCATTERED_DISTANCE;
 
 /**
@@ -21,13 +21,13 @@ export const GALAXY_SIZE = 2 * SCATTERED_DISTANCE;
  * @param RNG
  * @returns
  */
-export function plotGalaxy(RNG: () => number): { x: number; y: number } {
+export function plotGalaxy(RNG: () => number): { x: number; y: number; proximity: number | null } {
 	const part = sample({ [GalaxyPart.Center]: 3, [GalaxyPart.Arms]: 3, [GalaxyPart.Scattered]: 2 }, RNG) as GalaxyPart;
 	switch (part) {
 		case GalaxyPart.Center: {
 			const radius = CENTER_RADIUS * RNG();
-			const theta = RNG() * 2 * Math.PI;
-			return { x: radius * Math.cos(theta), y: radius * Math.sin(theta) };
+			const theta = 2 * Math.PI * RNG();
+			return { x: radius * Math.cos(theta), y: radius * Math.sin(theta), proximity: radius / GALAXY_SIZE };
 		}
 		case GalaxyPart.Arms: {
 			const useOtherArm = sample(2, RNG);
@@ -35,17 +35,21 @@ export function plotGalaxy(RNG: () => number): { x: number; y: number } {
 			const theta = ARM_INIT_THETA + ((radius - CENTER_RADIUS) / ARM_RADIUS) * ARM_TURNS + (useOtherArm ? Math.PI : 0);
 			const armThickness = ARM_TIP_THICKNESS + ((radius - CENTER_RADIUS) / ARM_RADIUS) * (ARM_BASE_THICKNESS - ARM_TIP_THICKNESS);
 			const lateralOffset = armThickness * RNG() - armThickness / 2;
-			const lateralOffsetX = lateralOffset * Math.sin(theta);
-			const lateralOffsetY = lateralOffset * Math.cos(theta);
+			const lateralOffsetX = lateralOffset * Math.cos(theta);
+			const lateralOffsetY = lateralOffset * Math.sin(theta);
 			return {
 				x: radius * Math.cos(theta) + lateralOffsetX,
 				y: radius * Math.sin(theta) + lateralOffsetY,
+				proximity: radius / GALAXY_SIZE,
 			};
 		}
 		case GalaxyPart.Scattered: {
+			const xRNG = RNG();
+			const yRNG = RNG();
 			return {
-				x: 2 * SCATTERED_DISTANCE * RNG() - SCATTERED_DISTANCE,
-				y: 2 * SCATTERED_DISTANCE * RNG() - SCATTERED_DISTANCE,
+				x: SCATTERED_DISTANCE * (2 * xRNG - 1),
+				y: SCATTERED_DISTANCE * (2 * yRNG - 1),
+				proximity: null,
 			};
 		}
 	}

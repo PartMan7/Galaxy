@@ -1,6 +1,6 @@
 import '@/frontend/styles/index.css';
 
-import { Galaxy } from '@/frontend/Galaxy';
+import { Galaxy } from '@/frontend/galaxy';
 
 export function App() {
 	return <Galaxy />;
