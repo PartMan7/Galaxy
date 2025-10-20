@@ -28,7 +28,7 @@ function Help() {
 		middleware: [offset(16), flip({ fallbackAxisSideDirection: 'start' }), shift(), arrow({ element: arrowRef })],
 	});
 
-	const hover = useHover(context, { move: false, delay: { close: 1000 } });
+	const hover = useHover(context, { move: false, delay: { close: 300 } });
 	const focus = useFocus(context);
 	const dismiss = useDismiss(context, { referencePress: false });
 	const role = useRole(context, { role: 'dialog' });
