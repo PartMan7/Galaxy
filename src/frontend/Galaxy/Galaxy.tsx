@@ -5,6 +5,7 @@ import type { GitHubStats } from '@/backend/types';
 
 import { Star } from './Star';
 import { Header } from './Header';
+import { Help } from './Help';
 import { GALAXY_SIZE } from './plotter';
 import { commitToStar } from './generators/commitToStar';
 import { pullRequestToStar } from './generators/pullRequestToStar';
@@ -56,6 +57,7 @@ export function Galaxy() {
 	return (
 		<>
 			<Header />
+			<Help />
 			<div id="galaxy" className="left-0 top-0 isolate">
 				{hoveredStar ? (
 					<div

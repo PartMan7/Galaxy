@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@apollo/client": "^4.0.7",
+		"@floating-ui/react": "^0.27.16",
 		"@js-temporal/polyfill": "^0.5.1",
 		"bun-plugin-tailwind": "^0.0.15",
 		"graphql": "^16.11.0",

@@ -64,8 +64,8 @@ The following permissions are required:
 Create a `.env` file in the project root directory:
 
 ```bash
+PUBLIC_GITHUB_USERNAME=(Your username here)
 GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-GITHUB_USERNAME=(Your username here)
 ```
 
 Replace the placeholder values with your actual GitHub token and username.
