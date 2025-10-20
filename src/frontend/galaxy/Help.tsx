@@ -86,8 +86,8 @@ function Help() {
 										recent commits, and commits with more changes are larger.
 									</li>
 									<li>
-										<strong>Pull Requests</strong> - All Pull Requests are rendered as bright blue, four-pointed stars. Brighter stars
-										represent more recent Pull Requests.
+										<strong>Pull Requests</strong> - All pull requests are rendered as bright blue, four-pointed stars. Brighter stars
+										represent more recent pull requests.
 									</li>
 									<li>
 										<strong>Issues</strong> - Issues are rendered as bright red, five-pointed stars. Brighter stars represent more
@@ -96,6 +96,9 @@ function Help() {
 								</ul>
 								<p className="pt-2">
 									Hover over any star to see details about that contribution. Click on a star to view it on GitHub.
+								</p>
+								<p className="pt-2">
+									If you'd like to see something similar for yourself, do reach out! I'll see if I can support other people's galaxies.
 								</p>
 							</div>
 							<div
