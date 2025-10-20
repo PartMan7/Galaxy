@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import plugin from 'bun-plugin-tailwind';
 import { existsSync } from 'fs';
-import { rm } from 'fs/promises';
+import { rm, cp, rmdir } from 'fs/promises';
 import path from 'path';
 
 if (process.argv.includes('--help') || process.argv.includes('-h')) {
@@ -136,6 +136,13 @@ const result = await Bun.build({
 });
 
 const end = performance.now();
+
+const docsSrc = path.join(process.cwd(), 'docs');
+const docsDest = path.join(outdir, 'docs');
+if (existsSync(docsSrc)) {
+	if (existsSync(docsDest)) await rmdir(docsDest, { recursive: true });
+	await cp(docsSrc, docsDest, { recursive: true });
+}
 
 const outputTable = result.outputs.map(output => ({
 	File: path.relative(process.cwd(), output.path),
