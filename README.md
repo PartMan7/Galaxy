@@ -1,9 +1,10 @@
 # Galaxy
 
-A visualization tool that displays GitHub contribution statistics as an interactive galaxy. Built with React, TypeScript, and Bun.
+A visualization tool that displays GitHub contribution statistics as an interactive galaxy. Built with React, TypeScript, and Bun. Check it out at [https://galaxy.partman.dev](https://galaxy.partman.dev)!
 
-<small>(Note to self: Add a screenshot here)</small><br/>
-<small>(Note to others: If https://galaxy.partman.dev has content and you can see this, poke me!)</small>
+<img src="./docs/screenshot.png" width="432" height="220" />
+
+You can hover over a star for details and a link.
 
 ## Prerequisites
 
