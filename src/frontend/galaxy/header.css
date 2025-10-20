@@ -1,0 +1,10 @@
+#header {
+	animation: fade-out var(--duration) forwards;
+	animation-delay: var(--delay);
+}
+
+@keyframes fade-out {
+	to {
+		opacity: 0;
+	}
+}

@@ -1,0 +1,58 @@
+.star {
+	--fade-in-duration: 1000ms;
+
+	--animation-star-fade-in: star-fade-in ease-in var(--fade-in-duration) var(--delay) both;
+	--animation-star-pulse: star-pulse ease-in var(--duration) calc(var(--delay) + var(--fade-in-duration)) infinite alternate;
+	--animation-star-drift: star-drift linear calc(var(--duration) * 4) infinite alternate;
+
+	--rotate-offset: rotate(calc(360deg / var(--points) + var(--rotation)));
+
+	@media (prefers-reduced-motion: no-preference) {
+		animation: var(--animation-star-fade-in), var(--animation-star-pulse);
+		&.drift {
+			animation: var(--animation-star-fade-in), var(--animation-star-pulse), var(--animation-star-drift);
+		}
+	}
+
+	animation: var(--animation-star-fade-in);
+
+	&:focus-visible {
+		outline: 2px solid var(--color-amber-50);
+		outline-offset: 2px;
+		box-shadow: 0 0 20px var(--color-amber-50);
+	}
+
+	&:hover,
+	&:focus {
+		transform: scale(1.5) var(--rotate-offset);
+		transition: transform 200ms ease-in-out;
+	}
+
+	will-change: transform;
+	transform: rotate(var(--rotation));
+	transition: transform 500ms ease-in-out;
+}
+
+@keyframes star-fade-in {
+	from {
+		opacity: 0;
+	}
+}
+
+@keyframes star-drift {
+	from {
+		transform: translate(0, 0);
+	}
+	to {
+		transform: var(--rotate-offset) translate(5px, 5px);
+	}
+}
+
+@keyframes star-pulse {
+	from {
+		opacity: var(calc(0.2 * var(--opacity)));
+	}
+	to {
+		opacity: var(--opacity);
+	}
+}
