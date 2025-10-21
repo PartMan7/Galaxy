@@ -1,7 +1,7 @@
 import { Temporal } from '@js-temporal/polyfill';
 import { cyrb128, useRNG } from '@/utils/prng';
 import { getBrightness, plotGalaxy } from '../plotter';
-import type { Bias, PullRequest, CommonStarProps } from '../types';
+import type { Bias, PullRequest, StarProps } from '../types';
 
 const MIN_SIZE = 12;
 const MAX_SIZE = 16;
@@ -13,7 +13,7 @@ function getPRSize(pullRequest: PullRequest): number {
 	return Math.min(MAX_SIZE, comments - COMMENTS_FOR_MIN + MIN_SIZE);
 }
 
-export function pullRequestToStar(pullRequest: PullRequest, bias: Bias): CommonStarProps {
+export function pullRequestToStar(pullRequest: PullRequest, bias: Bias): StarProps {
 	const prngSource = useRNG(cyrb128('url' in pullRequest ? pullRequest.url : pullRequest.uid + 'pullRequest')[0]);
 
 	return {
@@ -21,7 +21,7 @@ export function pullRequestToStar(pullRequest: PullRequest, bias: Bias): CommonS
 		...plotGalaxy(bias, prngSource),
 		size: getPRSize(pullRequest),
 		points: 4,
-		color: 'var(--color-blue-200)',
+		color: 'blue',
 		brightness: 'createdAt' in pullRequest ? getBrightness(Temporal.Instant.from(pullRequest.createdAt)) : 0.5,
 		url: 'url' in pullRequest ? pullRequest.url : null,
 		uid: 'uid' in pullRequest ? pullRequest.uid + '-pr' : undefined,

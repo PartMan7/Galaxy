@@ -1,6 +1,6 @@
 import './galaxy.css';
 
-import { useState, useMemo, useEffect, useLayoutEffect } from 'react';
+import { useState, useMemo, useEffect, useLayoutEffect, useCallback, type CSSProperties } from 'react';
 import type { GitHubStats } from '@/backend/types';
 
 import { Star } from './Star';
@@ -9,12 +9,15 @@ import { Help } from './Help';
 import { commitToStar } from './generators/commitToStar';
 import { pullRequestToStar } from './generators/pullRequestToStar';
 import { issueToStar } from './generators/issueToStar';
-import { getBias } from './plotter';
+import { GALAXY_SIZE, getBias } from './plotter';
 import { groupSub } from 'group-sub';
 import { PUBLIC_GITHUB_URL } from '@/constants';
 import { Loader } from './Loader';
+import { StarSource } from './icons';
+import { getAllStarProps } from './Star';
 
 const REQUEST_TIMEOUT = 2 * 60 * 1000; // 2 minutes
+const MARGIN = 50;
 
 export function Galaxy() {
 	const [data, setData] = useState<GitHubStats | null>(null);
@@ -53,10 +56,15 @@ export function Galaxy() {
 		const pullRequestStars = data?.pullRequests.map(pullRequest => pullRequestToStar(pullRequest, bias)) ?? [];
 		const issueStars = data?.issues.map(issue => issueToStar(issue, bias)) ?? [];
 
-		return [...commitStars, ...pullRequestStars, ...issueStars];
-	}, [data, windowWidth, windowHeight]);
+		return [...commitStars, ...pullRequestStars, ...issueStars].map(star => getAllStarProps(star));
+	}, [data]);
 
 	const [hoveredStar, setHoveredStar] = useState<{ url: string | null; desc: string } | null>(null);
+
+	// Memoize hover handler to prevent unnecessary Star re-renders
+	const handleStarHover = useCallback((star: { url: string | null; desc: string } | null) => {
+		setHoveredStar(star);
+	}, []);
 
 	return (
 		<>
@@ -69,7 +77,23 @@ export function Galaxy() {
 			)}
 
 			<Help username={username} />
-			<div id="galaxy" className="inset-0 h-full w-full isolate grid place-items-center">
+			<div className="invisible">
+				<StarSource />
+			</div>
+			<div
+				id="galaxy"
+				className="inset-0 h-full w-full isolate grid place-items-center"
+				style={useMemo(
+					() =>
+						({
+							'--center-x': `${windowWidth / 2}px`,
+							'--center-y': `${windowHeight / 2}px`,
+							'--scale-x': (windowWidth - MARGIN) / GALAXY_SIZE,
+							'--scale-y': (windowHeight - MARGIN) / GALAXY_SIZE,
+						}) as CSSProperties,
+					[windowWidth, windowHeight]
+				)}
+			>
 				<Loader hide={!!data || !!error} />
 				{hoveredStar ? (
 					<div
@@ -82,12 +106,7 @@ export function Galaxy() {
 					</div>
 				) : null}
 				{stars.map(star => (
-					<Star
-						key={'uid' in star && typeof star.uid === 'string' ? star.uid : star.url}
-						{...star}
-						center={{ x: windowWidth, y: windowHeight }}
-						onHover={setHoveredStar}
-					/>
+					<Star key={'uid' in star && typeof star.uid === 'string' ? star.uid : star.url} {...star} onHover={handleStarHover} />
 				))}
 			</div>
 		</>

@@ -7,14 +7,7 @@ export const HEADER_FADE_DURATION = 5000;
 const KEY = 'headerShown';
 
 function Header() {
-	// This only ever renders once
-	const [shown, setShown] = useState(() => {
-		const shown = localStorage.getItem(KEY);
-		if (shown) {
-			return true;
-		}
-		return false;
-	});
+	const [shown, setShown] = useState(() => !!localStorage.getItem(KEY));
 	useEffect(() => {
 		if (!shown) {
 			const timeout = setTimeout(

@@ -103,12 +103,12 @@ function Help({ username }: { username: string }) {
 										recent commits, and commits with more changes are larger.
 									</li>
 									<li>
-										<strong>Pull Requests</strong> - All pull requests are rendered as bright blue, four-pointed stars. Brighter stars
+										<strong>Pull Requests</strong> - All pull requests are rendered as pale blue, four-pointed stars. Brighter stars
 										represent more recent pull requests.
 									</li>
 									<li>
-										<strong>Issues</strong> - Issues are rendered as bright red, five-pointed stars. Brighter stars represent more
-										recent issues, and issues with more comments are larger.
+										<strong>Issues</strong> - Issues are rendered as pale red, five-pointed stars. Brighter stars represent more recent
+										issues, and issues with more comments are larger.
 									</li>
 								</ul>
 								<p className="py-2">

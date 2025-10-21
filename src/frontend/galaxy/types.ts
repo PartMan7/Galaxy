@@ -4,12 +4,12 @@ export type { GitHubCommit as Commit, GitHubPullRequest as PullRequest, GitHubIs
 // 'bias' is used by the plotting algorithm to favor certain layouts depending on the user's commit count
 export type Bias = (RNG: () => number) => GalaxyPart;
 
-export type CommonStarProps = {
+export type StarProps = {
 	coords: { x: number; y: number };
 	size: number;
 	points: 4 | 5;
 	desc: string;
-	color: string;
+	color: 'red' | 'yellow' | 'blue';
 	brightness: number;
 	url: string | null;
 	proximity: number | null;
