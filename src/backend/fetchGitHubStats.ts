@@ -16,11 +16,6 @@ import type {
 	RepositoryHistoryResponse,
 } from './types';
 
-const USERNAME = process.env.PUBLIC_GITHUB_USERNAME!;
-if (!USERNAME) {
-	throw new Error('PUBLIC_GITHUB_USERNAME is not set');
-}
-
 const USER_ID_QUERY = gql`
 	query GetUserId($username: String!) {
 		user(login: $username) {
@@ -313,6 +308,7 @@ async function fetchAllIssues(
 }
 
 export async function fetchGitHubStats(
+	username: string,
 	until: Temporal.Instant = Temporal.Now.instant(),
 	duration: Temporal.Duration = Temporal.Duration.from({ hours: 365 * 24 })
 ): Promise<GitHubStats> {
@@ -323,7 +319,7 @@ export async function fetchGitHubStats(
 		// First, get the user ID
 		const userIdResponse = await client.query<{ user: { id: string } }>({
 			query: USER_ID_QUERY,
-			variables: { username: USERNAME },
+			variables: { username },
 		});
 
 		if (!userIdResponse.data?.user?.id) {
@@ -335,7 +331,7 @@ export async function fetchGitHubStats(
 		// Now fetch contributions with the author filter
 		const response = await client.query<GitHubStatsResponse>({
 			query: CONTRIBUTIONS_QUERY,
-			variables: { authorName: USERNAME, from, to, since: from, until: to, authorId },
+			variables: { authorName: username, from, to, since: from, until: to, authorId },
 		});
 
 		if (response.error) {
@@ -396,7 +392,7 @@ export async function fetchGitHubStats(
 
 		// Paginate through all pull requests
 		const allPullRequestEdges = await fetchAllPullRequests(
-			USERNAME,
+			username,
 			from,
 			to,
 			collection.pullRequestContributions.edges,
@@ -419,7 +415,7 @@ export async function fetchGitHubStats(
 
 		// Paginate through all issues
 		const allIssueEdges = await fetchAllIssues(
-			USERNAME,
+			username,
 			from,
 			to,
 			collection.issueContributions.edges,

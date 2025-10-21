@@ -10,13 +10,26 @@ import { commitToStar } from './generators/commitToStar';
 import { pullRequestToStar } from './generators/pullRequestToStar';
 import { issueToStar } from './generators/issueToStar';
 import { getBias } from './plotter';
+import { groupSub } from 'group-sub';
+import { PUBLIC_GITHUB_URL } from '@/constants';
+import { Loader } from './Loader';
+
+const REQUEST_TIMEOUT = 2 * 60 * 1000; // 2 minutes
 
 export function Galaxy() {
 	const [data, setData] = useState<GitHubStats | null>(null);
+	const [error, setError] = useState<string | null>(null);
+
+	const username = window.location.pathname.replace(/^\/|\/$/g, '') || process.env.PUBLIC_GITHUB_USERNAME || 'PartMan7';
 	useEffect(() => {
-		fetch('/api/github')
-			.then(res => res.json())
-			.then(setData);
+		fetch(`/api/github/${username}`, { signal: AbortSignal.timeout(REQUEST_TIMEOUT) })
+			.then(res => res.json() as Promise<GitHubStats | { error: string }>)
+			.then(data => {
+				if ('error' in data) {
+					setError(data.error);
+					setData(null);
+				} else setData(data);
+			});
 	}, []);
 
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth / 2);
@@ -46,9 +59,17 @@ export function Galaxy() {
 
 	return (
 		<>
-			<Header />
-			<Help />
+			{error ? (
+				<div className="text-red-500 text-center text-2xl font-bold mt-[40vh]">
+					{groupSub(error, { 'GitHub repository': <a href={PUBLIC_GITHUB_URL}>GitHub repository</a> })}
+				</div>
+			) : (
+				<Header />
+			)}
+
+			<Help username={username} />
 			<div id="galaxy" className="inset-0 h-full w-full isolate grid place-items-center">
+				<Loader hide={!!data || !!error} />
 				{hoveredStar ? (
 					<div
 						id="hovered-star"

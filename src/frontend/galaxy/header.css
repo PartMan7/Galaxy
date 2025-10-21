@@ -1,6 +1,13 @@
 #header {
-	animation: fade-out var(--duration) forwards;
-	animation-delay: var(--delay);
+	animation:
+		fade-in 200ms both,
+		fade-out var(--duration) forwards var(--delay);
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
 }
 
 @keyframes fade-out {

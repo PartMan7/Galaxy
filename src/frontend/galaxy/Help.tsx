@@ -15,6 +15,7 @@ import {
 	FloatingPortal,
 	FloatingFocusManager,
 } from '@floating-ui/react';
+import { PUBLIC_GITHUB_URL } from '@/constants';
 
 function GitHubIcon() {
 	return (
@@ -32,7 +33,7 @@ function GitHubIcon() {
 	);
 }
 
-function Help() {
+function Help({ username }: { username: string }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const arrowRef = useRef(null);
 
@@ -91,8 +92,8 @@ function Help() {
 							<div className="text-amber-50 text-sm space-y-2">
 								<p>
 									This visualization shows a user's GitHub contributions (in this case,{' '}
-									<a href={`https://github.com/${process.env.PUBLIC_GITHUB_USERNAME}`} target="_blank" rel="noopener noreferrer">
-										{process.env.PUBLIC_GITHUB_USERNAME}'s
+									<a href={`https://github.com/${username}`} target="_blank" rel="noopener noreferrer">
+										{username}'s
 									</a>{' '}
 									contributions) as a galaxy of stars. Each star represents a different type of contribution:
 								</p>
@@ -116,7 +117,7 @@ function Help() {
 								<hr />
 								<p className="pt-2 text-xs">
 									Check out the project on{' '}
-									<a href="https://github.com/PartMan7/Galaxy" target="_blank" rel="noopener noreferrer">
+									<a href={PUBLIC_GITHUB_URL} target="_blank" rel="noopener noreferrer">
 										GitHub
 									</a>
 									! And if you'd like to see something similar for yourself, do reach out. I'll see if I can support other people's

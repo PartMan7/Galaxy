@@ -1,0 +1,1 @@
+export const PUBLIC_GITHUB_URL = 'https://github.com/PartMan7/Galaxy';

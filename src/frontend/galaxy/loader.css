@@ -1,0 +1,10 @@
+#loader {
+	animation: fade-in 3000ms var(--delay) ease-in backwards;
+	transition-duration: 500ms;
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+}

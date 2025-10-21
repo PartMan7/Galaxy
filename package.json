@@ -14,6 +14,7 @@
 		"@js-temporal/polyfill": "^0.5.1",
 		"bun-plugin-tailwind": "^0.0.15",
 		"graphql": "^16.11.0",
+		"group-sub": "^1.0.0",
 		"react": "^19",
 		"react-dom": "^19",
 		"tailwindcss": "^4.1.11"
