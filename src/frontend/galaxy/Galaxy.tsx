@@ -22,6 +22,7 @@ export function Galaxy() {
 
 	const username = window.location.pathname.replace(/^\/|\/$/g, '') || process.env.PUBLIC_GITHUB_USERNAME || 'PartMan7';
 	useEffect(() => {
+		document.title = `${username}'s GitHub Galaxy`;
 		fetch(`/api/github/${username}`, { signal: AbortSignal.timeout(REQUEST_TIMEOUT) })
 			.then(res => res.json() as Promise<GitHubStats | { error: string }>)
 			.then(data => {
