@@ -9,6 +9,7 @@ import { Help } from './Help';
 import { commitToStar } from './generators/commitToStar';
 import { pullRequestToStar } from './generators/pullRequestToStar';
 import { issueToStar } from './generators/issueToStar';
+import { getBias } from './plotter';
 
 export function Galaxy() {
 	const [data, setData] = useState<GitHubStats | null>(null);
@@ -32,9 +33,11 @@ export function Galaxy() {
 	}, []);
 
 	const stars = useMemo(() => {
-		const commitStars = data?.repositoryContributions.flatMap(repo => repo.commits.map(commitToStar)) ?? [];
-		const pullRequestStars = data?.pullRequests.map(pullRequestToStar) ?? [];
-		const issueStars = data?.issues.map(issueToStar) ?? [];
+		const bias = getBias((data?.totalCommits ?? 0) + (data?.totalPullRequests ?? 0) + (data?.totalIssues ?? 0));
+
+		const commitStars = data?.repositoryContributions.flatMap(repo => repo.commits.map(commit => commitToStar(commit, bias))) ?? [];
+		const pullRequestStars = data?.pullRequests.map(pullRequest => pullRequestToStar(pullRequest, bias)) ?? [];
+		const issueStars = data?.issues.map(issue => issueToStar(issue, bias)) ?? [];
 
 		return [...commitStars, ...pullRequestStars, ...issueStars];
 	}, [data, windowWidth, windowHeight]);

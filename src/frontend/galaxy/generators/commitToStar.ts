@@ -1,7 +1,7 @@
 import { Temporal } from '@js-temporal/polyfill';
-import { cyrb128, sample, useRNG } from '@/utils/prng';
+import { cyrb128, useRNG } from '@/utils/prng';
 import { getBrightness, plotGalaxy } from '../plotter';
-import type { Commit, CommonStarProps } from '../types';
+import type { Bias, Commit, CommonStarProps } from '../types';
 
 const MIN_SIZE = 10;
 const MAX_SIZE = 16;
@@ -15,12 +15,12 @@ function getCommitSize(commit: Commit): number {
 	return Math.round(MIN_SIZE + ((changes - MIN_CHANGES) / (MAX_CHANGES - MIN_CHANGES)) * (MAX_SIZE - MIN_SIZE));
 }
 
-export function commitToStar(commit: Commit): CommonStarProps {
+export function commitToStar(commit: Commit, bias: Bias): CommonStarProps {
 	const prngSource = useRNG(cyrb128(commit.revision + 'commit')[0]);
 
 	return {
 		desc: commit.message,
-		...plotGalaxy(prngSource),
+		...plotGalaxy(bias, prngSource),
 		size: getCommitSize(commit),
 		points: 4,
 		color: 'var(--color-amber-50)',

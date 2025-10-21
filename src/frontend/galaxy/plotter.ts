@@ -1,7 +1,8 @@
 import { sample } from '@/utils/prng';
 import { Temporal } from '@js-temporal/polyfill';
+import type { Bias } from './types';
 
-enum GalaxyPart {
+export enum GalaxyPart {
 	Center = 'center',
 	Arms = 'arms',
 	Scattered = 'scattered',
@@ -9,7 +10,7 @@ enum GalaxyPart {
 
 export const CENTER_RADIUS = 60;
 const ARM_INIT_THETA = Math.PI / 4;
-const ARM_TURNS = Math.PI * 2; // 1 full turn
+const ARM_TURNS = Math.PI * 2;
 export const ARM_RADIUS = 150;
 const ARM_BASE_THICKNESS = 50;
 const ARM_TIP_THICKNESS = 5;
@@ -17,16 +18,32 @@ const SCATTERED_DISTANCE = 250;
 export const GALAXY_SIZE = 2 * SCATTERED_DISTANCE;
 
 /**
+ * The plotter will favour more scattered layouts for lower commit counts.
+ */
+export function getBias(starCount: number): Bias {
+	// Anchor points: 1.5 min, 3000 / stars for range, 10 max
+	const scatteredWeight = Math.max(1.5, Math.min(10, 3000 / starCount));
+	// Center scales smoothly from 1 to 4 until 3000 stars
+	const centerWeight = Math.max(1, Math.min(3, 1 + (starCount * (4 - 1)) / 3000));
+
+	return RNG =>
+		sample({ [GalaxyPart.Center]: centerWeight, [GalaxyPart.Arms]: 3, [GalaxyPart.Scattered]: scatteredWeight }, RNG) as GalaxyPart;
+}
+
+/**
  * Returns coordinates relative to the center of the galaxy.
  * @param RNG
  * @returns
  */
-export function plotGalaxy(RNG: () => number): {
+export function plotGalaxy(
+	bias: Bias,
+	RNG: () => number
+): {
 	coords: { x: number; y: number };
 	proximity: number | null;
 	customRevolution: number | null;
 } {
-	const part = sample({ [GalaxyPart.Center]: 3, [GalaxyPart.Arms]: 3, [GalaxyPart.Scattered]: 2 }, RNG) as GalaxyPart;
+	const part = bias(RNG);
 	switch (part) {
 		case GalaxyPart.Center: {
 			const radius = CENTER_RADIUS * RNG();

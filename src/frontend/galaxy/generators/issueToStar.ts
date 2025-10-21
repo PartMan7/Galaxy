@@ -1,7 +1,7 @@
 import { Temporal } from '@js-temporal/polyfill';
-import { cyrb128, sample, useRNG } from '@/utils/prng';
+import { cyrb128, useRNG } from '@/utils/prng';
 import { getBrightness, plotGalaxy } from '../plotter';
-import type { Issue, CommonStarProps } from '../types';
+import type { Bias, Issue, CommonStarProps } from '../types';
 
 const MIN_SIZE = 12;
 const MAX_SIZE = 16;
@@ -13,12 +13,12 @@ function getIssueSize(issue: Issue): number {
 	return Math.min(MAX_SIZE, comments - COMMENTS_FOR_MIN + MIN_SIZE);
 }
 
-export function issueToStar(issue: Issue): CommonStarProps {
+export function issueToStar(issue: Issue, bias: Bias): CommonStarProps {
 	const prngSource = useRNG(cyrb128(issue.url + 'issue')[0]);
 
 	return {
 		desc: issue.title,
-		...plotGalaxy(prngSource),
+		...plotGalaxy(bias, prngSource),
 		size: getIssueSize(issue),
 		points: 5,
 		color: 'var(--color-red-200)',

@@ -1,4 +1,8 @@
+import type { GalaxyPart } from './plotter';
 export type { GitHubCommit as Commit, GitHubPullRequest as PullRequest, GitHubIssue as Issue } from '@/backend/types';
+
+// 'bias' is used by the plotting algorithm to favor certain layouts depending on the user's commit count
+export type Bias = (RNG: () => number) => GalaxyPart;
 
 export type CommonStarProps = {
 	coords: { x: number; y: number };
