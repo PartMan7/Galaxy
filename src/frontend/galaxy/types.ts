@@ -14,5 +14,6 @@ export type CommonStarProps = {
 	url: string | null;
 	proximity: number | null;
 	customRevolution: number | null;
+	uid?: string;
 	RNG: () => number;
 };

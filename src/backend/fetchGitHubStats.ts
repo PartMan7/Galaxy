@@ -403,7 +403,7 @@ export async function fetchGitHubStats(
 			collection.pullRequestContributions.pageInfo
 		);
 
-		const pullRequests: GitHubPullRequest[] = allPullRequestEdges.map(edge =>
+		const pullRequests: GitHubPullRequest[] = allPullRequestEdges.map((edge, index) =>
 			edge
 				? {
 						url: edge.node.pullRequest.url,
@@ -414,7 +414,7 @@ export async function fetchGitHubStats(
 						totalCommits: edge.node.pullRequest.commits.totalCount,
 						totalComments: edge.node.pullRequest.comments.totalCount,
 					}
-				: edge
+				: { uid: index }
 		);
 
 		// Paginate through all issues

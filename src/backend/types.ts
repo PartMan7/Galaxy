@@ -138,15 +138,19 @@ export type GitHubCommit = {
 	url: string;
 };
 
-export type GitHubPullRequest = {
-	url: string;
-	title: string;
-	createdAt: string;
-	merged: boolean;
-	headRefName: string;
-	totalCommits: number;
-	totalComments: number;
-} | null;
+export type GitHubPullRequest =
+	| {
+			url: string;
+			title: string;
+			createdAt: string;
+			merged: boolean;
+			headRefName: string;
+			totalCommits: number;
+			totalComments: number;
+	  }
+	| {
+			uid: number;
+	  };
 
 export type GitHubIssue = {
 	url: string;

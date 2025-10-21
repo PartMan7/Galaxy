@@ -60,7 +60,12 @@ export function Galaxy() {
 					</div>
 				) : null}
 				{stars.map(star => (
-					<Star key={star.url} {...star} center={{ x: windowWidth, y: windowHeight }} onHover={setHoveredStar} />
+					<Star
+						key={'uid' in star && typeof star.uid === 'string' ? star.uid : star.url}
+						{...star}
+						center={{ x: windowWidth, y: windowHeight }}
+						onHover={setHoveredStar}
+					/>
 				))}
 			</div>
 		</>
