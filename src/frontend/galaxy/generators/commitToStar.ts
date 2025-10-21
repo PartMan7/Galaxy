@@ -20,7 +20,7 @@ export function commitToStar(commit: Commit): CommonStarProps {
 
 	return {
 		desc: commit.message,
-		coords: plotGalaxy(prngSource),
+		...plotGalaxy(prngSource),
 		size: getCommitSize(commit),
 		points: 4,
 		color: 'var(--color-amber-50)',

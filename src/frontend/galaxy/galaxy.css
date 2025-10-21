@@ -4,32 +4,42 @@
 	--animation-star-fade-in: star-fade-in ease-in var(--fade-in-duration) var(--delay) both;
 	--animation-star-pulse: star-pulse ease-in var(--duration) calc(var(--delay) + var(--fade-in-duration)) infinite alternate;
 	--animation-star-drift: star-drift linear calc(var(--duration) * 4) infinite alternate;
+	--animation-star-drift-revolve: star-drift-revolve linear var(--revolution) infinite alternate;
+	--animation-star-revolve: star-revolve linear var(--revolution) infinite;
+	--animation-star-slow-revolve: star-revolve linear 1200s infinite;
 
 	--rotate-offset: rotate(calc(360deg / var(--points) + var(--rotation)));
 
+	--revolve-scale-from: scale(var(--scale-x), var(--scale-y)) rotate(0deg) translate(var(--left), var(--top)) rotate(360deg)
+		scale(calc(1 / var(--scale-x)), calc(1 / var(--scale-y)));
+	--revolve-scale-to: scale(var(--scale-x), var(--scale-y)) rotate(360deg) translate(var(--left), var(--top)) rotate(0deg)
+		scale(calc(1 / var(--scale-x)), calc(1 / var(--scale-y)));
+
 	@media (prefers-reduced-motion: no-preference) {
-		animation: var(--animation-star-fade-in), var(--animation-star-pulse);
+		animation: var(--animation-star-fade-in), var(--animation-star-pulse), var(--animation-star-revolve);
 		&.drift {
-			animation: var(--animation-star-fade-in), var(--animation-star-pulse), var(--animation-star-drift);
+			animation: var(--animation-star-fade-in), var(--animation-star-pulse), var(--animation-star-drift-revolve);
 		}
 	}
 
-	animation: var(--animation-star-fade-in);
+	animation: var(--animation-star-fade-in), var(--animation-star-slow-revolve);
 
 	&:focus-visible {
 		outline: 2px solid var(--color-amber-50);
 		outline-offset: 2px;
+		border-radius: 100vmax;
 		box-shadow: 0 0 20px var(--color-amber-50);
 	}
 
 	&:hover,
 	&:focus {
-		transform: scale(1.5) var(--rotate-offset);
-		transition: transform 200ms ease-in-out;
+		zoom: 1.5;
+		transition: zoom 200ms ease-in-out;
 	}
 
 	will-change: transform;
 	transform: rotate(var(--rotation));
+	transform-origin: center;
 	transition: transform 500ms ease-in-out;
 }
 
@@ -39,20 +49,29 @@
 	}
 }
 
-@keyframes star-drift {
-	from {
-		transform: translate(0, 0);
-	}
-	to {
-		transform: var(--rotate-offset) translate(5px, 5px);
-	}
-}
-
 @keyframes star-pulse {
 	from {
 		opacity: var(calc(0.2 * var(--opacity)));
 	}
 	to {
 		opacity: var(--opacity);
+	}
+}
+
+@keyframes star-revolve {
+	from {
+		transform: var(--revolve-scale-from) rotate(var(--rotation));
+	}
+	to {
+		transform: var(--revolve-scale-to) rotate(var(--rotation));
+	}
+}
+
+@keyframes star-drift-revolve {
+	from {
+		transform: var(--revolve-scale-from) rotate(var(--rotation)) translate(0, 0);
+	}
+	to {
+		transform: var(--revolve-scale-to) rotate(var(--rotation)) translate(5px, 5px);
 	}
 }

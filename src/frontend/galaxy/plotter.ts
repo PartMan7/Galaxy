@@ -21,13 +21,21 @@ export const GALAXY_SIZE = 2 * SCATTERED_DISTANCE;
  * @param RNG
  * @returns
  */
-export function plotGalaxy(RNG: () => number): { x: number; y: number; proximity: number | null } {
+export function plotGalaxy(RNG: () => number): {
+	coords: { x: number; y: number };
+	proximity: number | null;
+	customRevolution: number | null;
+} {
 	const part = sample({ [GalaxyPart.Center]: 3, [GalaxyPart.Arms]: 3, [GalaxyPart.Scattered]: 2 }, RNG) as GalaxyPart;
 	switch (part) {
 		case GalaxyPart.Center: {
 			const radius = CENTER_RADIUS * RNG();
 			const theta = 2 * Math.PI * RNG();
-			return { x: radius * Math.cos(theta), y: radius * Math.sin(theta), proximity: radius / GALAXY_SIZE };
+			return {
+				coords: { x: radius * Math.cos(theta), y: radius * Math.sin(theta) },
+				proximity: radius / GALAXY_SIZE,
+				customRevolution: sample([120, 720], RNG),
+			};
 		}
 		case GalaxyPart.Arms: {
 			const useOtherArm = sample(2, RNG);
@@ -38,18 +46,18 @@ export function plotGalaxy(RNG: () => number): { x: number; y: number; proximity
 			const lateralOffsetX = lateralOffset * Math.cos(theta);
 			const lateralOffsetY = lateralOffset * Math.sin(theta);
 			return {
-				x: radius * Math.cos(theta) + lateralOffsetX,
-				y: radius * Math.sin(theta) + lateralOffsetY,
+				coords: { x: radius * Math.cos(theta) + lateralOffsetX, y: radius * Math.sin(theta) + lateralOffsetY },
 				proximity: radius / GALAXY_SIZE,
+				customRevolution: null,
 			};
 		}
 		case GalaxyPart.Scattered: {
-			const xRNG = RNG();
-			const yRNG = RNG();
+			const radius = SCATTERED_DISTANCE * Math.sqrt(RNG());
+			const theta = 2 * Math.PI * RNG();
 			return {
-				x: SCATTERED_DISTANCE * (2 * xRNG - 1),
-				y: SCATTERED_DISTANCE * (2 * yRNG - 1),
+				coords: { x: radius * Math.cos(theta), y: radius * Math.sin(theta) },
 				proximity: null,
+				customRevolution: sample([400, 1000], RNG),
 			};
 		}
 	}

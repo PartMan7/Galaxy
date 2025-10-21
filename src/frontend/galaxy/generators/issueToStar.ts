@@ -18,7 +18,7 @@ export function issueToStar(issue: Issue): CommonStarProps {
 
 	return {
 		desc: issue.title,
-		coords: plotGalaxy(prngSource),
+		...plotGalaxy(prngSource),
 		size: getIssueSize(issue),
 		points: 5,
 		color: 'var(--color-red-200)',

@@ -18,7 +18,7 @@ export function pullRequestToStar(pullRequest: PullRequest): CommonStarProps {
 
 	return {
 		desc: pullRequest?.title ?? '(Private Pull Request)',
-		coords: plotGalaxy(prngSource),
+		...plotGalaxy(prngSource),
 		size: getPRSize(pullRequest),
 		points: 4,
 		color: 'var(--color-blue-200)',

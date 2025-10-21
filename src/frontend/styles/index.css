@@ -5,8 +5,12 @@
 		@apply text-[rgba(255,255,255,0.87)] bg-slate-950 font-sans;
 	}
 
+	#root {
+		@apply absolute inset-0;
+	}
+
 	body {
-		@apply grid place-items-center min-w-[320px] min-h-screen relative m-0;
+		@apply min-w-[320px] min-h-screen relative m-0 overflow-hidden;
 		background-image: url('@/background.png');
 		background-size: cover;
 		background-position: center;

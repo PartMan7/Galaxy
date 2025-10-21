@@ -6,12 +6,9 @@ import type { GitHubStats } from '@/backend/types';
 import { Star } from './Star';
 import { Header } from './Header';
 import { Help } from './Help';
-import { GALAXY_SIZE } from './plotter';
 import { commitToStar } from './generators/commitToStar';
 import { pullRequestToStar } from './generators/pullRequestToStar';
 import { issueToStar } from './generators/issueToStar';
-
-const MARGIN = 50;
 
 export function Galaxy() {
 	const [data, setData] = useState<GitHubStats | null>(null);
@@ -26,8 +23,10 @@ export function Galaxy() {
 
 	useLayoutEffect(() => {
 		function updateSize() {
-			setWindowWidth(window.innerWidth);
-			setWindowHeight(window.innerHeight);
+			console.log('donotpush', { old: [windowWidth, windowHeight], new: [window.innerWidth, window.innerHeight] }); // donotpush
+
+			setWindowWidth(document.documentElement.clientWidth);
+			setWindowHeight(document.documentElement.clientHeight);
 		}
 		window.addEventListener('resize', updateSize);
 		updateSize();
@@ -35,19 +34,9 @@ export function Galaxy() {
 	}, []);
 
 	const stars = useMemo(() => {
-		const normalize = (coords: { x: number; y: number; proximity: number | null }) => ({
-			x: (coords.x * (windowWidth - 2 * MARGIN)) / GALAXY_SIZE + windowWidth / 2,
-			y: (coords.y * (windowHeight - 2 * MARGIN)) / GALAXY_SIZE + windowHeight / 2,
-			proximity: coords.proximity,
-		});
-
-		const commitStars =
-			data?.repositoryContributions
-				.flatMap(repo => repo.commits.map(commitToStar))
-				.map(props => ({ ...props, coords: normalize(props.coords) })) ?? [];
-		const pullRequestStars =
-			data?.pullRequests.map(pullRequestToStar).map(props => ({ ...props, coords: normalize(props.coords) })) ?? [];
-		const issueStars = data?.issues.map(issueToStar).map(props => ({ ...props, coords: normalize(props.coords) })) ?? [];
+		const commitStars = data?.repositoryContributions.flatMap(repo => repo.commits.map(commitToStar)) ?? [];
+		const pullRequestStars = data?.pullRequests.map(pullRequestToStar) ?? [];
+		const issueStars = data?.issues.map(issueToStar) ?? [];
 
 		return [...commitStars, ...pullRequestStars, ...issueStars];
 	}, [data, windowWidth, windowHeight]);
@@ -58,11 +47,11 @@ export function Galaxy() {
 		<>
 			<Header />
 			<Help />
-			<div id="galaxy" className="left-0 top-0 isolate">
+			<div id="galaxy" className="inset-0 h-full w-full isolate grid place-items-center">
 				{hoveredStar ? (
 					<div
 						id="hovered-star"
-						className="absolute top-0 left-0 bg-zinc-800 max-w-sm z-10 p-4  border-r-4 border-b-4 border-double border-amber-50 pointer-events-none"
+						className="absolute top-0 left-0 bg-zinc-800 max-w-sm z-10 p-4 border-r-4 border-b-4 border-double border-amber-50 pointer-events-none"
 					>
 						{hoveredStar?.desc}
 						<br />
@@ -70,7 +59,7 @@ export function Galaxy() {
 					</div>
 				) : null}
 				{stars.map(star => (
-					<Star key={star.url} {...star} onHover={setHoveredStar} />
+					<Star key={star.url} {...star} center={{ x: windowWidth, y: windowHeight }} onHover={setHoveredStar} />
 				))}
 			</div>
 		</>

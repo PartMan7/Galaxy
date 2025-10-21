@@ -57,7 +57,7 @@ function Help() {
 			<button
 				ref={refs.setReference}
 				{...getReferenceProps()}
-				className="fixed top-8 right-8 z-50 bg-zinc-800 text-amber-50 w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold border-2 border-amber-50 hover:bg-zinc-700 transition-colors cursor-pointer shadow-lg"
+				className="absolute top-8 right-8 z-50 bg-zinc-800 text-amber-50 w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold border-2 border-amber-50 hover:bg-zinc-700 transition-colors cursor-pointer shadow-lg"
 				aria-label="Help"
 			>
 				?
