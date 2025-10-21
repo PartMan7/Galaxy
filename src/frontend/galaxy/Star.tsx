@@ -52,7 +52,7 @@ function Star({
 	const revolution = customRevolution ?? DEFAULT_REVOLUTION;
 
 	return (
-		<Icon
+		<div
 			tabIndex={0}
 			onFocus={() => onHover?.({ url, desc })}
 			onBlur={() => onHover?.(null)}
@@ -78,7 +78,9 @@ function Star({
 				'--duration': `${duration}ms`, // halved because the transition is on 'alternate'
 				'--delay': `${animationOffset}ms`, // we need to do something about all stars starting 'bright'; maybe something to animate them in?
 			}}
-		/>
+		>
+			<Icon className="inner-star" />
+		</div>
 	);
 }
 

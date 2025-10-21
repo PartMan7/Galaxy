@@ -8,7 +8,7 @@
 	--animation-star-revolve: star-revolve linear var(--revolution) infinite;
 	--animation-star-slow-revolve: star-revolve linear 1200s infinite;
 
-	--rotate-offset: rotate(calc(360deg / var(--points) + var(--rotation)));
+	--rotate-offset: calc(2 * 360deg / var(--points) + var(--rotation));
 
 	--revolve-scale-from: scale(var(--scale-x), var(--scale-y)) rotate(0deg) translate(var(--left), var(--top)) rotate(360deg)
 		scale(calc(1 / var(--scale-x)), calc(1 / var(--scale-y)));
@@ -31,16 +31,8 @@
 		box-shadow: 0 0 20px var(--color-amber-50);
 	}
 
-	&:hover,
-	&:focus {
-		/* zoom: 1.5; */
-		transition: zoom 200ms ease-in-out;
-	}
-
 	will-change: transform;
-	transform: rotate(var(--rotation));
 	transform-origin: center;
-	transition: transform 500ms ease-in-out;
 }
 
 @keyframes star-fade-in {
@@ -60,18 +52,31 @@
 
 @keyframes star-revolve {
 	from {
-		transform: var(--revolve-scale-from) rotate(var(--rotation));
+		transform: var(--revolve-scale-from);
 	}
 	to {
-		transform: var(--revolve-scale-to) rotate(var(--rotation));
+		transform: var(--revolve-scale-to);
 	}
 }
 
 @keyframes star-drift-revolve {
 	from {
-		transform: var(--revolve-scale-from) rotate(var(--rotation)) translate(0, 0);
+		transform: var(--revolve-scale-from) translate(0, 0);
 	}
 	to {
-		transform: var(--revolve-scale-to) rotate(var(--rotation)) translate(5px, 5px);
+		transform: var(--revolve-scale-to) translate(5px, 5px);
 	}
+}
+
+.inner-star {
+	&:hover,
+	&:focus,
+	.star:focus & {
+		transform: scale(2) rotate(var(--rotate-offset));
+		transition: transform 200ms ease-in-out;
+	}
+
+	transform: rotate(var(--rotation));
+	will-change: transform;
+	transition: transform 500ms ease-in-out;
 }
