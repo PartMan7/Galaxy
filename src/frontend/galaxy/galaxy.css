@@ -33,7 +33,7 @@
 
 	&:hover,
 	&:focus {
-		zoom: 1.5;
+		/* zoom: 1.5; */
 		transition: zoom 200ms ease-in-out;
 	}
 

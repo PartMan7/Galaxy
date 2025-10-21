@@ -23,8 +23,6 @@ export function Galaxy() {
 
 	useLayoutEffect(() => {
 		function updateSize() {
-			console.log('donotpush', { old: [windowWidth, windowHeight], new: [window.innerWidth, window.innerHeight] }); // donotpush
-
 			setWindowWidth(document.documentElement.clientWidth);
 			setWindowHeight(document.documentElement.clientHeight);
 		}
