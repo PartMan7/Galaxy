@@ -23,7 +23,7 @@ type AllStarProps = Omit<StarProps, 'RNG' | 'proximity' | 'coords' | 'size' | 'c
 const TIME_OFFSET = (ARM_RADIUS + CENTER_RADIUS) / GALAXY_SIZE;
 const COLORS = {
 	red: { fill: 'var(--color-red-200)', stroke: 'var(--color-red-300)' },
-	yellow: { fill: 'var(--color-amber-50)', stroke: 'var(--color-amber-200)' },
+	yellow: { fill: 'var(--color-amber-50)', stroke: 'var(--color-amber-100)' },
 	blue: { fill: 'var(--color-blue-200)', stroke: 'var(--color-blue-300)' },
 };
 export function getAllStarProps({
