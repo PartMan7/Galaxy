@@ -30,6 +30,9 @@
 		box-shadow: 0 0 20px var(--color-amber-50);
 	}
 
+	left: var(--center-x);
+	top: var(--center-y);
+
 	will-change: transform;
 	transform-origin: center;
 }

@@ -67,8 +67,8 @@ function Star({
 				// @ts-ignore -- CSS variables -- TODO add types for variables somewhere
 				'--left': `${coords.x}px`,
 				'--top': `${coords.y}px`,
-				'--center-x': `${center.x}px`,
-				'--center-y': `${center.y}px`,
+				'--center-x': `${center.x / 2}px`,
+				'--center-y': `${center.y / 2}px`,
 				'--scale-x': (center.x - MARGIN) / GALAXY_SIZE,
 				'--scale-y': (center.y - MARGIN) / GALAXY_SIZE,
 				'--opacity': `${Math.round(brightness * 100)}%`,
