@@ -3,7 +3,6 @@
 
 	--animation-star-fade-in: star-fade-in ease-in var(--fade-in-duration) var(--delay) both;
 	--animation-star-pulse: star-pulse ease-in var(--duration) calc(var(--delay) + var(--fade-in-duration)) infinite alternate;
-	--animation-star-drift: star-drift linear calc(var(--duration) * 4) infinite alternate;
 	--animation-star-drift-revolve: star-drift-revolve linear var(--revolution) infinite alternate;
 	--animation-star-revolve: star-revolve linear var(--revolution) infinite;
 	--animation-star-slow-revolve: star-revolve linear 1200s infinite;
