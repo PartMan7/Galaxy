@@ -65,7 +65,7 @@ Create a `.env` file in the project root directory:
 
 ```bash
 PUBLIC_GITHUB_USERNAME=(Your username here)
-GITHUB_REPOS="*" # This can be a comma-delimited list of names if you want to only allow specific names
+VALID_GITHUB_USERNAMES="*" # This can be a comma-delimited list of names if you want to only allow specific names
 GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
