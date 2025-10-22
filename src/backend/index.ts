@@ -25,7 +25,7 @@ const VALID_GITHUB_USERNAMES = process.env.VALID_GITHUB_USERNAMES?.split(/\s*,\s
 
 export default {
 	async github(username: string): Promise<GitHubStats> {
-		if (!VALID_GITHUB_USERNAMES.includes(username)) {
+		if (!VALID_GITHUB_USERNAMES.includes(username) && !VALID_GITHUB_USERNAMES.includes('*')) {
 			throw new Error(
 				`The username '${username}' has not been whitelisted. Reach out to PartMan7 on the GitHub repository if you'd like to see your galaxy added.`
 			);
