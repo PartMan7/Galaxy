@@ -91,7 +91,7 @@ function Help({ username }: { username: string }) {
 							<h3 className="text-amber-50 text-lg font-bold mb-2">How to Use GitHub Galaxy</h3>
 							<div className="text-amber-50 text-sm space-y-2">
 								<p>
-									This visualization shows a user's GitHub contributions (in this case,{' '}
+									This visualization shows a user's GitHub contributions over the past year (in this case,{' '}
 									<a href={`https://github.com/${username}`} target="_blank" rel="noopener noreferrer">
 										{username}'s
 									</a>{' '}
