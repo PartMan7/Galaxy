@@ -32,8 +32,6 @@ export function getBias(starCount: number): Bias {
 
 /**
  * Returns coordinates relative to the center of the galaxy.
- * @param RNG
- * @returns
  */
 export function plotGalaxy(
 	bias: Bias,
