@@ -46,7 +46,7 @@
 
 @keyframes star-pulse {
 	from {
-		opacity: var(calc(0.2 * var(--opacity)));
+		opacity: calc(0.2 * var(--opacity));
 	}
 	to {
 		opacity: var(--opacity);
